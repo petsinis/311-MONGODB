@@ -21,6 +21,11 @@ db = client.chicago_incidents
 
 app = Flask(__name__)
 
+#if __name__=="__main__":
+    #app.run(debug=True)
+    
+
+
 
 def not_date_given(date):
     context = {'error': "Sorry: Incorrect date format for: "+str(date)}  
@@ -244,8 +249,23 @@ def _insert_new_incident():
         if not (ObjectId.is_valid(row["_id"])):
             return({"error": "Not valid ObjectId "+str(row["_id"])})
             
+        
         row["_id"] = ObjectId(row["_id"])
-        res=db.requests.replace_one({"_id":row["_id"]}, row, upsert=True)
+        
+        #check if the _id is already part of the collection and keep the result
+        result = db.requests.find_one({"_id":  row["_id"]})
+        
+
+        #if there was an _id before
+        if result:
+            #if the _id was upvoted by same citizens
+            if "upvoted_by" in result:
+                #copy the citizens _ids to row
+                row["upvoted_by"]=result["upvoted_by"]
+
+        
+        #replace or insert the incident
+        res=db.requests.replace_one({"_id":row["_id"]}, row, upsert=True)   
 
     
     return({"Insertion finished":" "+str(res)})  

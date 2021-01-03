@@ -1,11 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Dec 31 12:19:47 2020
-
-@author: petsi
-"""
-
-
 int_type = list([
     "ssa", "zip_code", "ward", "police_district", "community_area", "historical_wards", "zip_codes", "community_areas",
     "census_tracts", "wards", "number_of_black_carts_delivered", "number_of_potholes_filled_on_black",

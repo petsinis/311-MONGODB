@@ -1,11 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Jan  2 13:08:57 2021
-
-@author: petsi
-"""
-
-
 from flask import Flask
 from flask import jsonify
 from flask import request
@@ -23,16 +15,11 @@ import constant
 from check_insert import check_row
 
 client = MongoClient()
-db = client.chicago_incidents2
+db = client.chicago_incidents
 
 
 
 app = Flask(__name__)
-
-#if __name__=="__main__":
-    #app.run(debug=True)
-    
-
 
 
 def not_date_given(date):
@@ -263,4 +250,85 @@ def _insert_new_incident():
     
     return({"Insertion finished":" "+str(res)})  
 
+
+@app.route("/upvote/<request_id>", methods = ["POST"])
+def upvote_request(request_id):
+    
+    # take citizen id from json payload
+    # do upvote logic  <= 1000, 2ble upvoting
+    citizen_id = request.json.get("citizen_id")
+    
+    if not (ObjectId.is_valid(request_id)) or not (ObjectId.is_valid(citizen_id)):
+        return jsonify({"error": "Not valid ObjectIds"})
+    
+
+    req_id = ObjectId(request_id)
+    cit_id = ObjectId(citizen_id)
+
+    result1 = db.requests.find_one({"_id": req_id})
+    result2 = db.citizens.find_one({"_id": cit_id})
+
+    if not result1:
+        return jsonify({"error": "Request not found"})
+    if not result2:
+        return jsonify({"error": "Citizen not found"})
+    
+
+    # check if request already upvoted by citizen
+    result = db.requests.aggregate([
+        {"$match": {"_id": req_id}}, 
+        {"$match": {"$expr": {"$in": [cit_id, {"$cond": {"if": {"$ifNull": ["$upvoted_by", False]}, "then": "$upvoted_by", "else": []}}]}}}, 
+    ])
+    
+    already_upvoted = len(list(result))
+    
+    if already_upvoted:
+        return jsonify({"error": "Request already upvoted by this citizen"})
+
+    # check if citizen's number of upvotes hit threshold
+    result = db.citizens.aggregate([
+        {"$match": {"_id": cit_id}}, 
+        {"$project": {"_id": 0, "num_of_upvotes": {"$cond": {"if": {"$ifNull": ["$upvotes", False]}, "then": {"$size": "$upvotes"}, "else": 0}}}}
+    ])
+
+    num_of_upvotes = list(result)[0].get("num_of_upvotes")
+
+    if num_of_upvotes > 999:
+        return jsonify({"error": "Citizen has reached the maximum number of upvotes"})
+    
+    
+    result1 = db.citizens.update_one({"_id": cit_id}, {"$addToSet": {"upvotes": req_id}})
+    result2 = db.requests.update_one({"_id": req_id}, {"$addToSet": {"upvoted_by": cit_id}})
+    
+    return jsonify({"sucess": "Upvoting successful"})
+
+
+@app.route("/downvote/<request_id>", methods = ["POST"])
+def downvote_request(request_id):
+    citizen_id = request.json.get("citizen_id")
+    
+    if not (ObjectId.is_valid(request_id)) or not (ObjectId.is_valid(citizen_id)):
+        return jsonify({"error": "Not valid ObjectIds"})
+    
+
+    req_id = ObjectId(request_id)
+    cit_id = ObjectId(citizen_id)
+
+    result1 = db.requests.find_one({"_id": req_id})
+    result2 = db.citizens.find_one({"_id": cit_id})
+
+    if not result1:
+        return jsonify({"error": "Request not found"})
+    if not result2:
+        return jsonify({"error": "Citizen not found"})
+    
+
+    
+    result1 = db.citizens.update_one({"_id": cit_id}, {"$pullAll": {"upvotes": [req_id]}})
+    result2 = db.requests.update_one({"_id": req_id}, {"$pullAll": {"upvoted_by": [cit_id]}})
+
+    db.citizens.update_one({"_id": cit_id, "upvotes": []}, {"$unset": {"upvotes": ""}})
+    db.requests.update_one({"_id": req_id, "upvoted_by": []}, {"$unset": {"upvoted_by": ""}})
+    
+    return jsonify({"sucess": "Downvoting successful"})
 

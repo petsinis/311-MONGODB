@@ -5,7 +5,7 @@ from bson.objectid import ObjectId
 
 client = MongoClient()
 
-db = client.chicago_incidents2
+db = client.chicago_incidents
 
 citizens = db.citizens
 requests = db.requests

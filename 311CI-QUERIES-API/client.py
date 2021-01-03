@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Jan  2 19:15:51 2021
-
-@author: petsi
-"""
-
 import requests
 import json
 
@@ -57,11 +50,31 @@ def insert_new_incident(new_inc):
                       data = json.dumps(new_inc))
     return(r)
 
+def upvote_request(citizen_id, request_id):
+    #request_id = "5feefde8f884f9ccd91e3094"
+    #citizen_id = "5ff082b06d74c9911f89577e"
+    
+    r = requests.post(f"http://localhost:5000/upvote/{request_id}", 
+                      headers = {"Content-Type": "application/json"}, data = json.dumps({"citizen_id": citizen_id}))
+    return(r)
+
+def downvote_request(citizen_id, request_id):
+    #request_id = "5feefe02f884f9ccd91ebfd5"
+    #citizen_id = "5ff082b06d74c9911f89577e"
+    
+    r = requests.post(f"http://localhost:5000/downvote/{request_id}", 
+                      headers = {"Content-Type": "application/json"}, data = json.dumps({"citizen_id": citizen_id}))
+
+    return(r)
+
+
 
 choice=0
-while((int(choice)<1)|(int(choice)>12)):
+while((int(choice)<1)|(int(choice)>14)):
     print("If you want to chose a query select a number from 1 to 11.")
     print("If you want to insert a new incident select 12.")
+    print("If you want to upvote a request on a citizen select 13.")
+    print("If you want to downvote a request on a citizen select 14.")
     print()
     choice = int(input("Your choice: "))
 
@@ -199,7 +212,7 @@ elif(choice==11):
     print()
     print(r.text)
     
-else:
+elif(choice==12):
     print("You chose to insert a new incident")
     print()
     name = input("Write the name of the json file that contains the new incident: ")
@@ -216,8 +229,33 @@ else:
         print()
         print(r.text)
         
-        
+elif(choice==13):
+    #citizen_id = "5fedbc57d6a49f481606a1fa"    
+    #request_id = "5fedb37ed6a49f4816c58fad"
+    print("You chose to upvote an incident for a given citizen")
+    print()
+    citizen_id = input("Write the id of the citizen: ")
+    request_id = input("Write the id of the incident: ")
+    print()
+    print("Upvoting incident "+str(request_id)+" for citizen "+str(citizen_id))
+    print()
+    r=upvote_request(str(citizen_id), str(request_id))
+    print()
+    print(r.text)
     
+else:
+    #citizen_id = "5fedbc57d6a49f481606a1fa" 
+    #request_id = "5fedb37ed6a49f4816c58fad"       
+    print("You chose to downvote an incident for a given citizen")
+    print()
+    citizen_id = input("Write the id of the citizen: ")
+    request_id = input("Write the id of the incident: ")
+    print()
+    print("Downvoting incident "+str(request_id)+" for citizen "+str(citizen_id))
+    print()
+    r=downvote_request(citizen_id, request_id)
+    print()
+    print(r.text)    
     
     
     

@@ -9,7 +9,7 @@ import math
 
 client = MongoClient()
 
-db = client.chicago_incidents2
+db = client.chicago_incidents
 
 requests = db.requests
 

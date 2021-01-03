@@ -1,7 +1,7 @@
 
 
 NUM_OF_CITIZENS = 5500
-NUM_OF_UPVOTES = 1000
+NUM_OF_UPVOTES = 850
 
 
 types = {

@@ -1,0 +1,22 @@
+{
+"_id":"5ff1d34cc3024a7f40aa8704",
+"creation_date":"2015-01-01T00:00:00.000Z",
+"status":"Completed",
+"completion_date":"2016-01-01T00:00:00.000Z",
+"service_request_number":"NEW",
+"type_of_service_request":"Abandoned Vehicle Complaint",
+"license_plate":"ZZK 5656",
+"vehicle_model":"LAMBO",
+"vehicle_color":"BLACK",
+"current_activity":"FVI - Outcome",
+"most_recent_action":"Vehicle was moved from original address requested",
+"days_as_parked":365,
+"street_address":"UOA",
+"zip_code":19,
+"ward":19,
+"police_district":20,
+"community_area":19,
+"ssa":19,
+"latitude":-87,
+"longitude":41
+}

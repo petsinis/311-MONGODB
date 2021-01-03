@@ -23,7 +23,7 @@ def check_row(row, names):
             try:
                 row[k]=int(math.ceil(float(row[k])))
             except ValueError:
-                return({'answer_list': "Sorry: Incorrect integer format for: "+str(row[k])} )    
+                return({'error': "Sorry: Incorrect integer format for: "+str(row[k])} )    
         else:
             del row[k]
     for k in list(set(names) & set(fieldnames.float_type)):
@@ -31,7 +31,7 @@ def check_row(row, names):
             try:
                 row[k]=float(row[k])
             except ValueError:
-                return({'answer_list': "Sorry: Incorrect float format for: "+str(row[k])} )        
+                return({'error': "Sorry: Incorrect float format for: "+str(row[k])} )        
         else:
             del row[k]        
     

@@ -242,6 +242,10 @@ def _insert_new_incident():
     #Convert fields to date/int/floats/string
     row=check_row(row, names)
     
+    #check for error
+    if "error" in row:
+        return(row["error"])
+    
     #Insert the new incident
     if("_id" not in names):
         res=db.requests.insert_one(row)
